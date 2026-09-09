@@ -1,8 +1,8 @@
 name: Sync upstream
 on:
   schedule:
-    - cron: '0 3 * * *'   # 每天 UTC 3 点(北京时间上午 11 点)
-  workflow_dispatch:        # 支持手动触发
+    - cron: '0 3 * * *'
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
@@ -16,5 +16,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add upstream https://github.com/wuzf/2fa.git
           git fetch upstream
-          git merge upstream/main --no-edit
+          git merge upstream/main --no-edit --allow-unrelated-histories -X theirs
           git push

@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: write
-  workflows: write        # ← 比官方多的一行,必须加
 
 concurrency:
   group: sync-upstream
@@ -41,6 +40,7 @@ jobs:
         run: |
           rsync -a --delete \
             --exclude '.git/' \
+            --exclude '.github/workflows/' \
             ../upstream/ ./
 
       - name: Merge deployment config
@@ -53,8 +53,6 @@ jobs:
             echo '### In-place upgrade'
             echo ''
             echo 'This workflow upgrades the current repository in place and keeps the same Cloudflare Worker, KV bindings, and existing Secrets.'
-            echo 'The upgrade path is the same whether `ENCRYPTION_KEY` is configured or not.'
-            echo 'Do not delete the Worker, GitHub repository, KV namespace, or re-create `ENCRYPTION_KEY` for a normal upgrade.'
             echo ''
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -62,17 +60,9 @@ jobs:
             {
               echo '### wrangler.toml merged automatically'
               echo ''
-              echo 'Code sync is complete. The workflow used the upstream `wrangler.toml` as the base and preserved deployment-specific local settings such as Worker name, KV IDs, routes, and selected environment-specific values.'
-              echo 'The diff below is expected when local deployment settings differ from the upstream defaults.'
-              echo ''
               echo '```diff'
               sed -n '1,200p' /tmp/wrangler.diff
               echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
-          else
-            {
-              echo '### wrangler.toml'
-              echo 'No `wrangler.toml` changes require review. After this push, Cloudflare can redeploy the same Worker directly from the updated repository.'
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 

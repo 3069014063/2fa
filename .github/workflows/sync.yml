@@ -1,0 +1,18 @@
+name: Sync upstream
+on:
+  schedule:
+    - cron: '0 3 * * *'   # 每天凌晨3点(UTC)
+  workflow_dispatch:        # 允许手动触发
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main, fetch-depth: 0 }
+      - run: |
+          git remote add upstream https://github.com/上游作者/上游仓库.git
+          git fetch upstream
+          git merge upstream/main --no-edit
+          git push
